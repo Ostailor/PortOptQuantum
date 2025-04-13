@@ -1,6 +1,6 @@
 # Quantum Portfolio Optimization
 
-This project demonstrates a hybrid quantum-classical approach to portfolio optimization using a Variational Quantum Linear Solver (VQLS) inspired by the Harrow–Hassidim–Lloyd (HHL) algorithm. In our implementation, we compare classical portfolio optimization with a quantum variational algorithm using Pennylane.
+This project demonstrates a hybrid quantum-classical approach to portfolio optimization using a variational quantum linear solver (VQLS) inspired by the Harrow–Hassidim–Lloyd (HHL) algorithm. It compares the classical portfolio optimization solution with a quantum solution implemented with Pennylane.
 
 ## Table of Contents
 
@@ -21,83 +21,77 @@ This project demonstrates a hybrid quantum-classical approach to portfolio optim
 
 ## Overview
 
-Portfolio optimization aims to determine the optimal allocation of assets to maximize return for a given level of risk. The classical Markowitz mean–variance model formulates this as a quadratic optimization problem. In contrast, our quantum approach employs a variational quantum linear solver (VQLS) that leverages ideas from the HHL algorithm to solve linear systems of equations. This project compares the portfolio weights, expected returns, volatility, and Sharpe ratios computed by both classical and quantum methods.
+Portfolio optimization involves allocating assets to maximize return for a given risk level. The classical Markowitz mean–variance model does this by minimizing the portfolio variance under certain return and budget constraints. Our quantum variant applies a hybrid quantum-classical approach using a variational quantum linear solver (VQLS) to solve the underlying linear system.
 
 ## Mathematical Background
 
 ### Classical Portfolio Optimization
 
-In the classical framework, we formulate the problem as follows:
+In the classical approach, we solve the following optimization problem:
 
-\[
+$$
 \min_{\mathbf{w}} \quad \frac{1}{2}\,\mathbf{w}^T \Sigma \, \mathbf{w}
-\]
+$$
+
 subject to
-\[
+
+$$
 \mathbf{r}^T \mathbf{w} = R_{\text{target}}, \quad \text{and} \quad \mathbf{1}^T \mathbf{w} = 1,
-\]
+$$
 
 where:
-- \(\Sigma\) is the covariance matrix of asset returns.
-- \(\mathbf{r}\) is the vector of expected asset returns.
-- \(R_{\text{target}}\) is the target return.
+- $\Sigma$ is the covariance matrix of the asset returns,
+- $\mathbf{r}$ is the vector of expected returns,
+- $R_{\text{target}}$ is the target return, and
+- $\mathbf{1}$ is the vector of ones.
 
-The solution can be obtained by solving a linear system and is often computed using standard numerical methods such as quadratic programming.
+The solution is computed using standard classical optimization techniques.
 
 ### Quantum Portfolio Optimization (VQLS/HHL Approach)
 
-Our quantum algorithm aims to solve a linear system of the form
+Our quantum algorithm addresses the problem by solving the linear system
 
-\[
-Ax = b,
-\]
+$$
+A x = b,
+$$
 
-where:
-- \(A\) is an augmented matrix derived from the covariance matrix and constraint conditions.
-- \(b\) is a vector constructed from asset returns and budget constraints.
+where $A$ is an augmented matrix constructed from $\Sigma$ and the constraints, and $b$ is the corresponding vector.
 
-The HHL algorithm theoretically computes the solution \(x = A^{-1}b\) by:
-1. **Preparing a quantum state** \(|b\rangle\) that encodes the vector \(b\).
-2. **Performing quantum phase estimation (QPE)** on a unitary \(U = e^{iAt}\) to implicitly determine the eigenvalues \(\lambda_j\) and eigenvectors \(|u_j\rangle\) of \(A\).  
-   In the eigenbasis, we express:
-   \[
-   |b\rangle = \sum_{j} \beta_j \, |u_j\rangle,
-   \]
-   so that
-   \[
-   A^{-1}|b\rangle = \sum_{j} \frac{\beta_j}{\lambda_j} |u_j\rangle.
-   \]
-3. **Controlled rotations** are applied to "load" the reciprocal eigenvalues \(1/\lambda_j\) into an ancilla qubit, effectively performing the inversion.
-4. **Uncomputation and post-selection** remove the ancillary data, leaving a state proportional to the solution \(x\).
+The algorithm is based on the spectral decomposition of $A$. First, the vector $b$ is encoded into a quantum state $|b\rangle$, and we express it in the eigenbasis of $A$:
 
-In our variational (VQLS) approach, we simulate this behavior by designing an ansatz, defining a cost function that penalizes deviations from the classical target, and then using a classical optimizer in a hybrid loop.
+$$
+|b\rangle = \sum_{j} \beta_j \, |u_j\rangle,
+$$
+
+where
+$$
+\beta_j = \langle u_j|b \rangle.
+$$
+
+Then, the solution state (proportional to $x = A^{-1}b$) is given by
+
+$$
+A^{-1}|b\rangle = \sum_{j} \frac{\beta_j}{\lambda_j} |u_j\rangle,
+$$
+
+where $\lambda_j$ are the eigenvalues of $A$. In our variational approach, we design an ansatz, define a cost function that penalizes deviation from the desired state, and use a classical optimizer to adjust the parameters of the quantum circuit.
 
 ## Implementation Details
 
 ### Project Structure
 
-- **classical_portfolio_optimizer.py:**  
-  Contains the classical portfolio optimization routines and functions for computing portfolio weights, expected returns, volatility, and Sharpe ratio.
-
-- **quantum_solver.py:**  
-  Provides helper functions such as `pad_matrix_and_vector` and `is_power_of_2`, which are used to prepare the augmented matrix \(A\) and vector \(b\) for the quantum algorithm.
-
-- **quantum_portfolio_optimizer.py:**  
-  Contains the `QuantumPortfolioOptimizer` class. This class implements the variational quantum linear solver (VQLS) using Pennylane. It defines the ansatz, cost function, and optimization loop.
-
-- **app.py:**  
-  A Flask application that exposes an API endpoint (`/compare`) to compare classical and quantum portfolio solutions. It utilizes the modules above to fetch data, run optimizations, and output results in JSON format.
+- **classical_portfolio_optimizer.py:** Contains classical portfolio optimization routines.
+- **quantum_solver.py:** Provides helper functions (e.g., `pad_matrix_and_vector`, `is_power_of_2`) for preparing the matrix $A$ and vector $b$.
+- **quantum_portfolio_optimizer.py:** Implements the `QuantumPortfolioOptimizer` class, which defines the variational ansatz, the cost function, and the optimization routine using Pennylane.
+- **app.py:** A Flask application that exposes an API endpoint (`/compare`) to compare classical and quantum solutions.
 
 ### Key Modules and Functions
 
-- **Ansatz and Cost Function (quantum_portfolio_optimizer.py):**  
-  - **Ansatz:** Constructs a quantum circuit using single-qubit rotations (e.g., \(R_Y\) gates) and entangling gates (e.g., CNOTs).
-  - **Cost Function:** The cost is a combination of:
-    - A base cost that measures the difference between the state obtained via the quantum circuit and the state \(b\).
-    - Penalty terms that force the "active" portion of the state (corresponding to assets) to be close to the target weights.
-    
+- **Ansatz and Cost Function:**  
+  The quantum ansatz uses rotation gates (such as $R_Y$) and CNOTs to prepare a candidate quantum state. The cost function measures the difference between the quantum state and the target state (which is the classical solution, if specified), including penalty terms for deviations in the "active" subspace corresponding to asset weights.
+
 - **Warm-Start Initial State:**  
-  The warm-start is constructed by taking the square root of the classical weights. This state is used as an initial guess for the quantum optimizer.
+  The warm-start initial state is built using the square roots of the classical weights, providing a good initial guess for the variational optimization.
 
 ## Performance Evaluation and Analysis
 
