@@ -137,44 +137,75 @@ class QuantumPortfolioOptimizer:
         debug_logs = []
 
         def cost(params, step):
+            # Construct quantum state from parameters using the ansatz circuit
             psi = state_circuit(params)
-            #print(f"DEBUG (cost, step {step}): psi shape: {psi.shape}")
+        
+            # Compute expectation value of A with respect to the state |ψ⟩, i.e., ⟨ψ|A|ψ⟩
             exp_val = qml.math.sum(qml.math.conj(psi) * (A @ psi))
             exp_val = qml.math.real(exp_val)
+        
+            # Avoid division by very small numbers for numerical stability
             exp_val = qml.math.abs(exp_val) if qml.math.abs(exp_val) > 1e-8 else 1e-8
+        
+            # Compute the squared overlap between the state |ψ⟩ and the target vector |b⟩
             overlap = qml.math.abs(qml.math.sum(qml.math.conj(b) * psi))**2
+        
+            # Base cost: 1 - (|⟨b|ψ⟩|² / ⟨ψ|A|ψ⟩), squared to penalize deviations more strongly
             base_cost = (1 - (overlap / exp_val))**2
+        
+            # Inactive penalty: sum of amplitudes in padded (inactive) region of |ψ⟩
             padded_amp = psi[n_active:]
             penalty_inactive = qml.math.sum(qml.math.abs(padded_amp)**2)
+        
+            # Active penalty: squared deviation between actual amplitudes and target weights in active region
             active_amp = psi[:n_active]
             active_weights = qml.math.abs(active_amp)**2
             penalty_active = qml.math.sum((active_weights - target_weights)**2)
+        
+            # Weighting for penalties increases over time using tanh for smooth scaling
             p_weight = penalty_weight_max * np.tanh(step / (steps / 2))
             extra_weight = extra_dist_weight_max * np.tanh(step / (steps / 2))
+        
+            # Total cost combines all three components
             total_cost = base_cost + p_weight * penalty_inactive + extra_weight * penalty_active
+        
             return qml.math.real(total_cost)
 
+
         for i in range(steps):
+            # Perform one optimization step and get current cost
             params, cost_val = opt.step_and_cost(lambda p: cost(p, i), params)
+        
+            # Log diagnostics every 10 steps
             if i % 10 == 0:
                 psi = state_circuit(params)
-                #print(f"DEBUG: After step {i}, psi = {psi} and psi[:n_active]={psi[:n_active]}")
+        
+                # Recompute diagnostic values for debugging
                 exp_val = qml.math.sum(qml.math.conj(psi) * (A @ psi))
                 exp_val = qml.math.real(exp_val)
                 exp_val = qml.math.abs(exp_val) if qml.math.abs(exp_val) > 1e-8 else 1e-8
+        
                 overlap = qml.math.abs(qml.math.sum(qml.math.conj(b) * psi))**2
                 base_cost = (1 - (overlap / exp_val))**2
+        
                 padded_amp = psi[n_active:]
                 penalty_inactive = qml.math.sum(qml.math.abs(padded_amp)**2)
+        
                 active_amp = psi[:n_active]
                 active_weights = qml.math.abs(active_amp)**2
                 penalty_active = qml.math.sum((active_weights - target_weights)**2)
+        
+                # Recompute dynamic weights for logging purposes
                 p_weight = penalty_weight_max * np.tanh(i / (steps / 2))
                 extra_weight = extra_dist_weight_max * np.tanh(i / (steps / 2))
+        
+                # Compose the debug message
                 msg = (f"Step {i}: Base cost={base_cost:.4f}, Inactive penalty={penalty_inactive:.4f}, "
                        f"Active penalty={penalty_active:.4f}, Total cost={cost(params, i):.4f}")
+        
                 print(msg)
                 debug_logs.append(msg)
+
 
         print("Optimized parameters:", params)
         final_cost = cost(params, steps)
