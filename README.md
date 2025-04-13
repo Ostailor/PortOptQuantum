@@ -64,8 +64,9 @@ $$
 $$
 
 where
+
 $$
-\beta_j = \langle u_j|b \rangle.
+|b\rangle = \sum_{j} \beta_j \, |u_j\rangle,
 $$
 
 Then, the solution state (proportional to $x = A^{-1}b$) is given by
