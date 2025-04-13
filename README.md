@@ -36,13 +36,12 @@ $$
 subject to
 
 $$
-\mathbf{r}^T \mathbf{w} = R_{\text{target}}, \quad \text{and} \quad \mathbf{1}^T \mathbf{w} = 1,
+\quad \mathbf{1}^T \mathbf{w} = 1,
 $$
 
 where:
 - $\Sigma$ is the covariance matrix of the asset returns,
-- $\mathbf{r}$ is the vector of expected returns,
-- $R_{\text{target}}$ is the target return, and
+- $\mathbf{w}$ is the weights of each asset, and
 - $\mathbf{1}$ is the vector of ones.
 
 The solution is computed using standard classical optimization techniques.
@@ -142,13 +141,11 @@ where $\lambda_j$ are the eigenvalues of $A$. In our variational approach, we de
      ```bash
      python app.py
      ```
-     Then, send a POST request to `http://localhost:5000/compare` with JSON containing:
-     ```json
-     {
-         "tickers": ["MSFT", "TSLA"],
-         "start_date": "2020-01-01",
-         "end_date": "2021-01-01"
-     }
+     Then to run the front end:
+     ```bash
+     cd portfolio-optimizer-frontend
+     npm run build
+     serve -s build
      ```
    - **Direct Execution:**  
      You can also run the comparison functions directly from a script to see console output with debug information.
