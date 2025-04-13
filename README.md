@@ -41,8 +41,7 @@ $$
 
 where:
 - $\Sigma$ is the covariance matrix of the asset returns,
-- $\mathbf{r}$ is the vector of expected returns,
-- $R_{\text{target}}$ is the target return, and
+- $\mathbf{w}$ is the weights of each asset, and
 - $\mathbf{1}$ is the vector of ones.
 
 The solution is computed using standard classical optimization techniques.
