@@ -142,13 +142,11 @@ where $\lambda_j$ are the eigenvalues of $A$. In our variational approach, we de
      ```bash
      python app.py
      ```
-     Then, send a POST request to `http://localhost:5000/compare` with JSON containing:
-     ```json
-     {
-         "tickers": ["MSFT", "TSLA"],
-         "start_date": "2020-01-01",
-         "end_date": "2021-01-01"
-     }
+     Then to run the front end:
+     ```bash
+     cd portfolio-optimizer-frontend
+     npm run build
+     serve -s build
      ```
    - **Direct Execution:**  
      You can also run the comparison functions directly from a script to see console output with debug information.
