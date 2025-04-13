@@ -189,8 +189,8 @@ class QuantumPortfolioOptimizer:
     def calculate_portfolio_metrics(self, weights):
         """Calculate portfolio metrics: expected return, volatility, and Sharpe ratio."""
         weights = np.array(weights, dtype=float)
-        mean_returns = np.array(self.mean_returns, dtype=float)
-        cov_matrix = np.array(self.cov_matrix.to_numpy(), dtype=float)
+        mean_returns = np.array(self.mean_returns, dtype=float)*252
+        cov_matrix = np.array(self.cov_matrix.to_numpy(), dtype=float)*252
         portfolio_return = np.sum(weights * mean_returns)
         portfolio_volatility = np.sqrt(weights.T @ cov_matrix @ weights)
         sharpe_ratio = (portfolio_return - 0.02) / portfolio_volatility

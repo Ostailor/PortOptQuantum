@@ -23,8 +23,8 @@ class ClassicalPortfolioOptimizer:
         
         df = pd.DataFrame(data)
         self.returns = df.pct_change().dropna()
-        self.mean_returns = self.returns.mean()
-        self.cov_matrix = self.returns.cov()
+        self.mean_returns = self.returns.mean()*252
+        self.cov_matrix = self.returns.cov()*252
         
         # Debug prints to inspect data
         print("Mean Returns:", self.mean_returns)
