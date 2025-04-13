@@ -11,8 +11,8 @@ class ClassicalPortfolioOptimizer:
         self.start_date = start_date
         self.end_date = end_date
         self.returns = None
-        self.cov_matrix = None
         self.mean_returns = None
+        self.cov_matrix = None
         
     def fetch_data(self):
         """Fetch historical price data and calculate returns."""
@@ -25,6 +25,10 @@ class ClassicalPortfolioOptimizer:
         self.returns = df.pct_change().dropna()
         self.mean_returns = self.returns.mean()
         self.cov_matrix = self.returns.cov()
+        
+        # Debug prints to inspect data
+        print("Mean Returns:", self.mean_returns)
+        print("Covariance Matrix:\n", self.cov_matrix)
         
     def optimize_portfolio(self, target_return=None, risk_free_rate=0.02):
         """Optimize portfolio using Markowitz mean-variance optimization."""
@@ -46,12 +50,20 @@ class ClassicalPortfolioOptimizer:
         
         # Initial guess: equal weights.
         initial_weights = np.ones(n_assets) / n_assets
+        print("DEBUG: Initial guess for weights:", initial_weights)
         
         result = minimize(portfolio_variance, initial_weights, method='SLSQP', bounds=bounds, constraints=constraints)
+        
+        # Debug prints: show optimization details.
+        print("DEBUG: Optimization Result:")
+        print("  Final Weights:", result.x)
+        print("  Portfolio Variance (Objective):", portfolio_variance(result.x))
+        print("  Expected Return:", np.sum(result.x * self.mean_returns))
+        
         return result.x
     
     def calculate_portfolio_metrics(self, weights, risk_free_rate=0.02):
-        """Calculate portfolio metrics."""
+        """Calculate portfolio metrics: expected return, volatility, and Sharpe ratio."""
         portfolio_return = np.sum(weights * self.mean_returns)
         portfolio_volatility = np.sqrt(weights.T @ self.cov_matrix @ weights)
         sharpe_ratio = (portfolio_return - risk_free_rate) / portfolio_volatility
@@ -66,7 +78,6 @@ class ClassicalPortfolioOptimizer:
         """
         Plot the efficient frontier and mark the Minimum Variance Portfolio (MVP).
         """
-        # Generate a range of target returns between the minimum and maximum mean returns.
         target_returns = np.linspace(self.mean_returns.min(), self.mean_returns.max(), num_points)
         frontier_volatilities = []
         frontier_returns = []

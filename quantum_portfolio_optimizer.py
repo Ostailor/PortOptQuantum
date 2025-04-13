@@ -138,7 +138,7 @@ class QuantumPortfolioOptimizer:
 
         def cost(params, step):
             psi = state_circuit(params)
-            print(f"DEBUG (cost, step {step}): psi shape: {psi.shape}")
+            #print(f"DEBUG (cost, step {step}): psi shape: {psi.shape}")
             exp_val = qml.math.sum(qml.math.conj(psi) * (A @ psi))
             exp_val = qml.math.real(exp_val)
             exp_val = qml.math.abs(exp_val) if qml.math.abs(exp_val) > 1e-8 else 1e-8
@@ -158,7 +158,7 @@ class QuantumPortfolioOptimizer:
             params, cost_val = opt.step_and_cost(lambda p: cost(p, i), params)
             if i % 10 == 0:
                 psi = state_circuit(params)
-                print(f"DEBUG: After step {i}, psi = {psi} and psi[:n_active]={psi[:n_active]}")
+                #print(f"DEBUG: After step {i}, psi = {psi} and psi[:n_active]={psi[:n_active]}")
                 exp_val = qml.math.sum(qml.math.conj(psi) * (A @ psi))
                 exp_val = qml.math.real(exp_val)
                 exp_val = qml.math.abs(exp_val) if qml.math.abs(exp_val) > 1e-8 else 1e-8
