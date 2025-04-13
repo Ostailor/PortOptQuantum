@@ -21,7 +21,7 @@ This project demonstrates a hybrid quantum-classical approach to portfolio optim
 
 ## Overview
 
-Portfolio optimization involves allocating assets to maximize return for a given risk level. The classical Markowitz mean–variance model does this by minimizing the portfolio variance under certain return and budget constraints. Our quantum variant applies a hybrid quantum-classical approach using a variational quantum linear solver (VQLS) to solve the underlying linear system.
+Portfolio optimization involves allocating assets to maximize return for a given risk level. The classical Markowitz mean–variance model does this by minimizing the portfolio variance under certain return and budget constraints. My quantum variant applies a hybrid quantum-classical approach using a variational quantum linear solver (VQLS) to solve the underlying linear system.
 
 ## Mathematical Background
 
@@ -48,7 +48,7 @@ The solution is computed using standard classical optimization techniques.
 
 ### Quantum Portfolio Optimization (VQLS/HHL Approach)
 
-Our quantum algorithm addresses the problem by solving the linear system
+My quantum algorithm addresses the problem by solving the linear system
 
 $$
 A x = b,
@@ -74,7 +74,7 @@ $$
 A^{-1}|b\rangle = \sum_{j} \frac{\beta_j}{\lambda_j} |u_j\rangle,
 $$
 
-where $\lambda_j$ are the eigenvalues of $A$. In our variational approach, we design an ansatz, define a cost function that penalizes deviation from the desired state, and use a classical optimizer to adjust the parameters of the quantum circuit.
+where $\lambda_j$ are the eigenvalues of $A$. In my variational approach, we design an ansatz, define a cost function that penalizes deviation from the desired state, and use a classical optimizer to adjust the parameters of the quantum circuit.
 
 ## Implementation Details
 
@@ -100,12 +100,12 @@ where $\lambda_j$ are the eigenvalues of $A$. In our variational approach, we de
 - **Comparison Metrics:**  
   We compare portfolio weights, expected returns, volatility, and Sharpe ratios between the classical and quantum solutions.
 - **Observed Results:**  
-  In our experiments with a two-asset portfolio (e.g., "MSFT" and "TSLA"), the classical optimizer might yield weights like `[1.0, 0.0]`. The quantum optimizer, guided by a cost function that penalizes deviations from this target, converges to weights close to `[0.9895, 0.0105]`—indicating high accuracy in matching the classical solution.
+  In my experiments with a two-asset portfolio (e.g., "MSFT" and "TSLA"), the classical optimizer might yield weights like `[1.0, 0.0]`. The quantum optimizer, guided by a cost function that penalizes deviations from this target, converges to weights close to `[0.9895, 0.0105]`—indicating high accuracy in matching the classical solution.
 
 ### Resource Requirements
 
 - **Qubit Count:**  
-  Our example uses an augmented $4 \times 4$ matrix for two assets, which is implemented using $\log_2(4)=2$ qubits.
+  My example uses an augmented $4 \times 4$ matrix for two assets, which is implemented using $\log_2(4)=2$ qubits.
 - **Quantum Gates:**  
   The ansatz consists of a small number of $R_Y$ gates and CNOT gates. Resource requirements will increase with more assets.
 - **Hybrid Loop:**  
@@ -116,7 +116,7 @@ where $\lambda_j$ are the eigenvalues of $A$. In our variational approach, we de
 - **Quantum Advantage:**  
   The HHL algorithm offers exponential speedup in solving linear systems under ideal conditions (sparse matrices, low condition number).  
 - **Variational Approach:**  
-  Our VQLS method is better suited for near-term devices (NISQ era) but may require careful ansatz design and noise management to scale to larger problems.
+  My VQLS method is better suited for near-term devices (NISQ era) but requires careful ansatz design and noise management to scale to larger problems.
 - **Hybrid Complexity:**  
   As problem size increases, both the quantum circuit depth and the number of variational parameters increase.
 
