@@ -36,7 +36,7 @@ $$
 subject to
 
 $$
-\mathbf{r}^T \mathbf{w} = R_{\text{target}}, \quad \text{and} \quad \mathbf{1}^T \mathbf{w} = 1,
+\quad \mathbf{1}^T \mathbf{w} = 1,
 $$
 
 where:
