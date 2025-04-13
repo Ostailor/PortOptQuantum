@@ -60,13 +60,13 @@ The HHL algorithm theoretically computes the solution $x = A^{-1}b$ by:
 1. **Preparing a quantum state** $|b\rangle$ that encodes the vector $b$.
 2. **Performing quantum phase estimation (QPE)** on a unitary $U = e^{iAt}$ to implicitly determine the eigenvalues $\lambda_j$ and eigenvectors $|u_j\rangle$ of $A$.  
    In the eigenbasis, we express:
-   $$
+   $
    |b\rangle = \sum_{j} \beta_j \, |u_j\rangle,
-   $$
+   $
    so that
-   $$
+   $
    A^{-1}|b\rangle = \sum_{j} \frac{\beta_j}{\lambda_j} |u_j\rangle.
-   $$
+   $
 3. **Controlled rotations** are applied to "load" the reciprocal eigenvalues $1/\lambda_j$ into an ancilla qubit, effectively performing the inversion.
 4. **Uncomputation and post-selection** remove the ancillary data, leaving a state proportional to the solution $x$.
 
