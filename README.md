@@ -30,7 +30,7 @@ Portfolio optimization involves allocating assets to maximize return for a given
 In the classical approach, we solve the following optimization problem:
 
 $$
-\min_{\mathbf{w}} \mathbf{w}^T \Sigma \, \mathbf{w}
+\min_{\mathbf{w}} \mathbf{w}^T \Sigma  \mathbf{w}
 $$
 
 subject to
