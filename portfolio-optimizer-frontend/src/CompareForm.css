@@ -1,0 +1,44 @@
+/* CompareForm.css */
+
+/* Make the body fill the entire viewport and remove default margin/padding */
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Ensure the root element also takes full height so child components can stretch */
+#root {
+  height: 100%;
+}
+
+/* Container that spans full height/width of the screen */
+.compare-form-container {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* centers vertically */
+  align-items: center;     /* centers horizontally */
+  background-color: #fff7e6; /* A soft background color for the form page */
+}
+
+/* Customize your Paper or Card background, if using MUI's Paper/Card */
+.compare-paper {
+  padding: 2rem;
+  background-color: #ffe6bf; /* A complementary accent color */
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Text Field or other form element spacing tweaks */
+.compare-textfield {
+  margin-bottom: 1rem;
+}
+
+/* Button styling: MUI’s ‘contained’ uses your theme primary color. 
+   We can do minimal overrides or rely on the theme. */
+.compare-button {
+  margin-top: 1rem;
+}
+

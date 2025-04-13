@@ -15,7 +15,7 @@ class ClassicalPortfolioOptimizer:
         self.mean_returns = None
         
     def fetch_data(self):
-        """Fetch historical price data and calculate returns"""
+        """Fetch historical price data and calculate returns."""
         data = {}
         for ticker in self.tickers:
             stock = yf.Ticker(ticker)
@@ -27,47 +27,34 @@ class ClassicalPortfolioOptimizer:
         self.cov_matrix = self.returns.cov()
         
     def optimize_portfolio(self, target_return=None, risk_free_rate=0.02):
-        """Optimize portfolio using Markowitz mean-variance optimization"""
+        """Optimize portfolio using Markowitz mean-variance optimization."""
         n_assets = len(self.tickers)
         
-        # Define objective function (minimize portfolio variance)
+        # Objective: minimize portfolio variance.
         def portfolio_variance(weights):
             return weights.T @ self.cov_matrix @ weights
         
-        # Define constraints
-        constraints = [
-            {'type': 'eq', 'fun': lambda x: np.sum(x) - 1},  # weights sum to 1
-        ]
+        # Constraints: weights sum to 1.
+        constraints = [{'type': 'eq', 'fun': lambda x: np.sum(x) - 1}]
         
+        # If a target return is set, enforce that constraint.
         if target_return is not None:
-            constraints.append({
-                'type': 'eq',
-                'fun': lambda x: np.sum(x * self.mean_returns) - target_return
-            })
+            constraints.append({'type': 'eq', 'fun': lambda x: np.sum(x * self.mean_returns) - target_return})
         
-        # Define bounds
+        # Bounds: weights are between 0 and 1.
         bounds = tuple((0, 1) for _ in range(n_assets))
         
-        # Initial guess (equal weights)
+        # Initial guess: equal weights.
         initial_weights = np.ones(n_assets) / n_assets
         
-        # Optimize
-        result = minimize(
-            portfolio_variance,
-            initial_weights,
-            method='SLSQP',
-            bounds=bounds,
-            constraints=constraints
-        )
-        
+        result = minimize(portfolio_variance, initial_weights, method='SLSQP', bounds=bounds, constraints=constraints)
         return result.x
     
-    def calculate_portfolio_metrics(self, weights):
-        """Calculate portfolio metrics"""
+    def calculate_portfolio_metrics(self, weights, risk_free_rate=0.02):
+        """Calculate portfolio metrics."""
         portfolio_return = np.sum(weights * self.mean_returns)
         portfolio_volatility = np.sqrt(weights.T @ self.cov_matrix @ weights)
-        sharpe_ratio = (portfolio_return - 0.02) / portfolio_volatility
-        
+        sharpe_ratio = (portfolio_return - risk_free_rate) / portfolio_volatility
         return {
             'weights': weights,
             'expected_return': portfolio_return,
@@ -75,53 +62,55 @@ class ClassicalPortfolioOptimizer:
             'sharpe_ratio': sharpe_ratio
         }
     
-    def plot_efficient_frontier(self, num_points=20):
-        """Plot the efficient frontier"""
-        target_returns = np.linspace(
-            self.mean_returns.min(),
-            self.mean_returns.max(),
-            num_points
-        )
-        
-        volatilities = []
-        returns = []
+    def plot_efficient_frontier(self, num_points=50, risk_free_rate=0.02):
+        """
+        Plot the efficient frontier and mark the Minimum Variance Portfolio (MVP).
+        """
+        # Generate a range of target returns between the minimum and maximum mean returns.
+        target_returns = np.linspace(self.mean_returns.min(), self.mean_returns.max(), num_points)
+        frontier_volatilities = []
+        frontier_returns = []
         
         for target_return in target_returns:
             weights = self.optimize_portfolio(target_return)
-            portfolio_metrics = self.calculate_portfolio_metrics(weights)
-            volatilities.append(portfolio_metrics['volatility'])
-            returns.append(portfolio_metrics['expected_return'])
+            metrics = self.calculate_portfolio_metrics(weights, risk_free_rate)
+            frontier_volatilities.append(metrics['volatility'])
+            frontier_returns.append(metrics['expected_return'])
         
         plt.figure(figsize=(10, 6))
-        plt.plot(volatilities, returns, 'b-')
-        plt.title('Efficient Frontier')
-        plt.xlabel('Volatility')
-        plt.ylabel('Expected Return')
+        plt.plot(frontier_volatilities, frontier_returns, 'b-', label="Efficient Frontier")
+        plt.xlabel("Volatility")
+        plt.ylabel("Expected Return")
+        plt.title("Efficient Frontier")
         plt.grid(True)
+        
+        # Compute the Minimum Variance Portfolio (MVP) by optimizing without target_return.
+        mvp_weights = self.optimize_portfolio()
+        mvp_metrics = self.calculate_portfolio_metrics(mvp_weights, risk_free_rate)
+        plt.plot(mvp_metrics['volatility'], mvp_metrics['expected_return'], 'ro', markersize=10, label="MVP")
+        plt.legend()
         plt.show()
+        
+        return mvp_weights, mvp_metrics
 
 def main():
     # Example usage
-    tickers = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META']
-    end_date = datetime.now()
+    tickers = ['MSFT', 'TSLA']
+    end_date = datetime.strptime("2021-01-01", "%Y-%m-%d")
     start_date = end_date - timedelta(days=365)
     
     optimizer = ClassicalPortfolioOptimizer(tickers, start_date, end_date)
     optimizer.fetch_data()
     
-    # Optimize for minimum variance
-    min_var_weights = optimizer.optimize_portfolio()
-    min_var_metrics = optimizer.calculate_portfolio_metrics(min_var_weights)
+    # Compute the Minimum Variance Portfolio (MVP)
+    mvp_weights, mvp_metrics = optimizer.plot_efficient_frontier(num_points=50)
     
-    print("\nMinimum Variance Portfolio:")
-    for ticker, weight in zip(tickers, min_var_weights):
+    print("\nMinimum Variance Portfolio (MVP):")
+    for ticker, weight in zip(tickers, mvp_weights):
         print(f"{ticker}: {weight:.2%}")
-    print(f"Expected Return: {min_var_metrics['expected_return']:.2%}")
-    print(f"Volatility: {min_var_metrics['volatility']:.2%}")
-    print(f"Sharpe Ratio: {min_var_metrics['sharpe_ratio']:.2f}")
-    
-    # Plot efficient frontier
-    optimizer.plot_efficient_frontier()
+    print(f"Expected Return: {mvp_metrics['expected_return']:.2%}")
+    print(f"Volatility: {mvp_metrics['volatility']:.2%}")
+    print(f"Sharpe Ratio: {mvp_metrics['sharpe_ratio']:.2f}")
 
 if __name__ == "__main__":
-    main() 
+    main()
