@@ -105,9 +105,9 @@ where $\lambda_j$ are the eigenvalues of $A$. In our variational approach, we de
 ### Resource Requirements
 
 - **Qubit Count:**  
-  Our example uses an augmented \(4 \times 4\) matrix for two assets, which is implemented using \(\log_2(4)=2\) qubits.
+  Our example uses an augmented $4 \times 4$ matrix for two assets, which is implemented using $\log_2(4)=2$ qubits.
 - **Quantum Gates:**  
-  The ansatz consists of a small number of \(R_Y\) gates and CNOT gates. Resource requirements will increase with more assets.
+  The ansatz consists of a small number of $R_Y$ gates and CNOT gates. Resource requirements will increase with more assets.
 - **Hybrid Loop:**  
   The algorithm relies on a classical optimizer (e.g., Adam) to update the quantum circuit parameters.
 
@@ -127,7 +127,7 @@ where $\lambda_j$ are the eigenvalues of $A$. In our variational approach, we de
    - **Dependencies:**  
      Install required packages using pip:
      ```bash
-     pip install pennylane numpy pandas yfinance flask flask-cors
+     pip install -r requirements.txt
      ```
 2. **Project Files:**
    - Ensure the following modules are available:
