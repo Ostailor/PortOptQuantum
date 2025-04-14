@@ -164,7 +164,3 @@ where $\lambda_j$ are the eigenvalues of $A$. In my variational approach, we des
 ## License
 
 [MIT License](LICENSE)
-
----
-
-This README, along with the well-documented source code, provides a comprehensive overview of the project, the underlying mathematics of both classical and quantum optimization, and instructions to reproduce the results. Feel free to modify this README to better reflect any additional details or future enhancements.
