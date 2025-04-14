@@ -126,7 +126,7 @@ class QuantumPortfolioOptimizer:
         target_weights = target_weights / np.sum(target_weights)
         print("Final target (classical) weights:", target_weights, "with shape:", target_weights.shape)
 
-        # Build warm-start initial state.
+        # Build warm-start initial state
         if initial_state is not None:
             print("Using provided warm-start initial state.")
         else:
